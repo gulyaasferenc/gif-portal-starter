@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const Connected = ({ gifs, setGifList }) => {
+const Connected = ({ gifs, setGifList, createGifAccount }) => {
   const [inputValue, setInputvalue] = useState('')
 
   const onInputChange = (event) => {
@@ -16,34 +16,46 @@ const Connected = ({ gifs, setGifList }) => {
       console.log('Empty input. Try again.')
     }
   }
-
-  return (
-    <div className='connected-container'>
-      <form
-        onSubmit={(event) => {
-          event.preventDefault()
-          sendGif()
-        }}
-      >
-        <input
-          value={inputValue}
-          onChange={onInputChange}
-          type='text'
-          placeholder='Enter gif link!'
-        />
-        <button type='submit' className='cta-button submit-gif-button'>
-          Submit
+  if (gifs === null) {
+    return (
+      <div className='connected-container'>
+        <button
+          className='cta-button submit-gif-button'
+          onClick={createGifAccount}
+        >
+          Do One-Time Initialization For GIF Program Account
         </button>
-      </form>
-      <div className='gif-grid'>
-        {gifs.map((gif) => (
-          <div className='gif-item' key={gif}>
-            <img src={gif} alt={gif} />
-          </div>
-        ))}
       </div>
-    </div>
-  )
+    )
+  } else {
+    return (
+      <div className='connected-container'>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault()
+            sendGif()
+          }}
+        >
+          <input
+            value={inputValue}
+            onChange={onInputChange}
+            type='text'
+            placeholder='Enter gif link!'
+          />
+          <button type='submit' className='cta-button submit-gif-button'>
+            Submit
+          </button>
+        </form>
+        <div className='gif-grid'>
+          {gifs.map((gif, index) => (
+            <div className='gif-item' key={index}>
+              <img src={gif} alt={gif} />
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
 }
 
 export default Connected
