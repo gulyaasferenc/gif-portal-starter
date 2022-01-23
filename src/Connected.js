@@ -1,6 +1,15 @@
 import { useState } from 'react'
 
-const Connected = ({ gifs, setGifList, createGifAccount }) => {
+const Connected = ({
+  gifs,
+  getGifList,
+  createGifAccount,
+  getProvider,
+  baseAccount,
+  idl,
+  Program,
+  programId,
+}) => {
   const [inputValue, setInputvalue] = useState('')
 
   const onInputChange = (event) => {
@@ -10,8 +19,21 @@ const Connected = ({ gifs, setGifList, createGifAccount }) => {
   const sendGif = async () => {
     if (inputValue.length > 0) {
       console.log('Gif link:', inputValue)
-      setGifList([...gifs, inputValue])
-      setInputvalue('')
+      try {
+        const provider = getProvider()
+        const program = new Program(idl, programId, provider)
+        await program.rpc.addGif(inputValue, {
+          accounts: {
+            baseAccount: baseAccount.publicKey,
+            user: provider.wallet.publicKey,
+          },
+        })
+        await getGifList()
+      } catch (error) {
+        console.log('Send gif error', error)
+      } finally {
+        setInputvalue('')
+      }
     } else {
       console.log('Empty input. Try again.')
     }
@@ -49,7 +71,7 @@ const Connected = ({ gifs, setGifList, createGifAccount }) => {
         <div className='gif-grid'>
           {gifs.map((gif, index) => (
             <div className='gif-item' key={index}>
-              <img src={gif} alt={gif} />
+              <img src={gif.gifLink} alt={gif} />
             </div>
           ))}
         </div>

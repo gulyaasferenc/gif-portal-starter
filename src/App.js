@@ -2,6 +2,7 @@ import twitterLogo from './assets/twitter-logo.svg'
 import './App.css'
 import { useEffect, useState } from 'react'
 import idl from './idl.json'
+import kp from './keypair.json'
 import { Connection, PublicKey, clusterApiUrl } from '@solana/web3.js'
 import { Program, Provider, web3 } from '@project-serum/anchor'
 import Connected from './Connected'
@@ -10,19 +11,16 @@ import Connected from './Connected'
 const TWITTER_HANDLE = '_buildspace'
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`
 
-const TEST_GIFS = [
-  'https://media.giphy.com/media/BZl097s905ay7sJAL4/giphy.gif',
-  'https://media.giphy.com/media/F3G8ymQkOkbII/giphy.gif',
-  'https://media.giphy.com/media/4wAO1N5uusbMQ/giphy.gif',
-]
-
 const { SystemProgram, Keypair } = web3
-let baseAccount = Keypair.generate()
 const programId = new PublicKey(idl.metadata.address)
 const network = clusterApiUrl('devnet')
 const opts = {
   preflightCommitment: 'processed',
 }
+
+const arr = Object.values(kp._keypair.secretKey)
+const secret = new Uint8Array(arr)
+const baseAccount = web3.Keypair.fromSecretKey(secret)
 
 const App = () => {
   const [walletAddress, setWalletAddress] = useState(null)
@@ -91,6 +89,7 @@ const App = () => {
     try {
       const provider = getProvider()
       const program = new Program(idl, programId, provider)
+      console.log('got the account', baseAccount)
       const account = await program.account.baseAccount.fetch(
         baseAccount.publicKey
       )
@@ -113,9 +112,6 @@ const App = () => {
 
       // Call Solana program here.
       getGifList()
-
-      // Set state
-      setGifList(TEST_GIFS)
     }
   }, [walletAddress])
 
@@ -137,8 +133,13 @@ const App = () => {
           ) : (
             <Connected
               gifs={giftList}
-              setGifList={setGifList}
+              getGifList={getGifList}
               createGifAccount={createGifAccount}
+              getProvider={getProvider}
+              baseAccount={baseAccount}
+              idl={idl}
+              Program={Program}
+              programId={programId}
             />
           )}
         </div>
