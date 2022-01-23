@@ -20,7 +20,7 @@ const opts = {
 
 const arr = Object.values(kp._keypair.secretKey)
 const secret = new Uint8Array(arr)
-const baseAccount = web3.Keypair.fromSecretKey(secret)
+const baseAccount = Keypair.fromSecretKey(secret)
 
 const App = () => {
   const [walletAddress, setWalletAddress] = useState(null)
@@ -113,6 +113,7 @@ const App = () => {
       // Call Solana program here.
       getGifList()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [walletAddress])
 
   return (
